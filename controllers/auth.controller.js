@@ -20,11 +20,12 @@ export const register = async (req, res) => {
     const hash = await bcrypt.hash(password, 10);
     const user = await User.create({ name, email, password: hash });
 
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: "1d" });
 
     res.cookie("token", token, {
         httpOnly: true,
-        sameSite: "strict"
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "None"
     });
 
     res.status(201).json({
@@ -48,11 +49,12 @@ export const login = async (req, res) => {
     if (!user || !(await bcrypt.compare(password, user.password)))
         return res.status(401).json({ message: "Invalid credentials" });
 
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: "1d" });
 
     res.cookie("token", token, {
         httpOnly: true,
-        sameSite: "strict"
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "None"
     });
 
     res.json({
@@ -89,7 +91,7 @@ export const logout = async (req, res) => {
     res.clearCookie("token", {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
-        sameSite: "strict",
+        sameSite: "None",
     });
 
     return res.status(200).json({ message: "Logged out successfully" });
