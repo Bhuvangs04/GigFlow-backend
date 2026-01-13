@@ -12,7 +12,7 @@ const app = express();
 
 
 app.use(cors({
-    origin: "http://localhost:8080",
+    origin: "https://gig-flow-frontend-orcin.vercel.app",
     credentials: true
 })); 
 
